@@ -2,7 +2,7 @@
 <info>
     <id>mailer</id>
     <name>Mailer</name>
-    <description>My first ownCloud app</description>
+    <description>Mail app for CERNBox to send custom mails</description>
     <licence>AGPL</licence>
     <author>Hugo Gonzalez Labrador (CERN)</author>
     <version>0.0.1</version>
