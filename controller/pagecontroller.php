@@ -70,13 +70,13 @@ class PageController extends Controller {
 
 			$htmlBody = sprintf(
 				"<p>Hey there, just letting you know that</p><p><b>%s</b> shared the folder <q><b>%s</b></q> with you (<b>%s</b>).</p>"
-				. "<p>If you are logged in as <b>%s</b> you can go to <a href='%s'>CERNBox</a>  and click the tab 'Shared with me' to find the shared folder.</p>"
+				. "<p>If you are logged in as <b>%s</b> you can go to <a href='%s'>CERNBox</a>  and click the tab 'Shared with you' to find the shared folder.</p>"
 				. "<p>Also, if you want to sync the share in your desktop sync client add a new folder with this path: <p><code>%s</code></p></p>"
 				. "<p>Best regards,</br>CERNBox Team</p>",
 				$this->userInfo->getDisplayName(), basename($share->getTarget()), $recipientInfo->getUID(), $recipientInfo->getUID(), $serviceURL, $shareInfo['eos.file']);
 			$textBody = sprintf(
 				"Hey there, just letting you know that\n%s shared the folder %s with you (%s).\n"
-				. "If you are logged in as %s you can go to '%s' and click the tab 'Shared with me' to find the shared folder.\n"
+				. "If you are logged in as %s you can go to '%s' and click the tab 'Shared with you' to find the shared folder.\n"
 				. "Also, if you want to sync the share in your desktop sync client add a new folder with this path: %s\n\n"
 				. "Best regards,\nCERNBox Team",
 				$this->userInfo->getDisplayName(), basename($share->getTarget()), $recipientInfo->getUID(), $recipientInfo->getUID(), $serviceURL, $shareInfo['eos.file']);
@@ -103,13 +103,13 @@ class PageController extends Controller {
 			$subject = sprintf("%s shared the folder '%s' with you through the e-group '%s'", $this->userInfo->getDisplayName(), basename($shareInfo['eos.file']), $recipient);
 			$htmlBody = sprintf(
 				"<p>Hey there, just letting you know that </p><p><b>%s</b> shared the folder <q><b>%s</b></q> with the e-group <b>%s</b>, which you are member of it.</p>"
-				. "<p>If you login to <a href='%s'>CERNBox</a> you can click the tab 'Shared with me' to see the shared folder</p>"
+				. "<p>If you login to <a href='%s'>CERNBox</a> you can click the tab 'Shared with you' to see the shared folder</p>"
 				. "<p>Also, if you want to sync the share in your desktop sync client add a new folder with this path: %s</p>"
 				. "<p>Best regards,</br>CERNBox Team</p>",
 				$this->userInfo->getDisplayName(), basename($share->getTarget()), $recipient, $serviceURL, $shareInfo['eos.file']);
 			$textBody = sprintf(
 				"Hey there, just letting you know that %s shared the folder %s with the e-group %s, which you are member of it\n"
-				. "If you login to <a href='%s'>CERNBox</a> you can click the tab 'Shared with me' to see the shared folder\n"
+				. "If you login to <a href='%s'>CERNBox</a> you can click the tab 'Shared with you' to see the shared folder\n"
 				. "Also, if you want to sync the share in your desktop sync client add a new folder with this path: %s\n\n"
 				. "Best regards,\nCERNBox Team",
 				$this->userInfo->getDisplayName(), basename($share->getTarget()), $recipient, $serviceURL, $shareInfo['eos.file']);
