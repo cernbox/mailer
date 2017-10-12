@@ -67,13 +67,20 @@ class PageController extends Controller {
 				throw new ShareNotFound("recipient does not exist");
 			}
 			$subject = sprintf("%s shared the folder '%s' with you", $this->userInfo->getDisplayName(), basename($shareInfo['eos.file']), $recipientInfo->getUID());
+
 			$htmlBody = sprintf(
-				"<p>Dear user,</p><p><b>%s</b> shared the folder <q><b>%s</b></q> with your account <b>%s</b>.</p>"
-				. "<p>If you are logged in as <b>%s</b> you can click <a href='%s'>here</a> to access the shared folder, else you can go to <a href='%s'>%s</a> to find the shared folder under the 'Shared with me' tab.</p>"
-				. "<p>To synchronise this folder please follow the instructions at <a href=''>this KB</a> using the following path: <p><code>%s</code></p></p>"
+				"<p>Hey there, just letting you know that</p><p><b>%s</b> shared the folder <q><b>%s</b></q> with you (<b>%s</b>).</p>"
+				. "<p>If you are logged in as <b>%s</b> you can go to <a href='%s'>CERNBox</a>  and click the tab 'Shared with me' to find the shared folder.</p>"
+				. "<p>Also, if you want to sync the share in your desktop sync client add a new folder with this path: <p><code>%s</code></p></p>"
 				. "<p>Best regards,</br>CERNBox Team</p>",
-				$this->userInfo->getDisplayName(), basename($shareInfo['eos.file']), $recipientInfo->getUID(), $recipientInfo->getUID(), $directURL, $sharedWithMeURL, $serviceURL, $shareInfo['eos.file']);
-			$textBody = sprintf("Hola paquito");
+				$this->userInfo->getDisplayName(), basename($share->getTarget()), $recipientInfo->getUID(), $recipientInfo->getUID(), $serviceURL, $shareInfo['eos.file']);
+			$textBody = sprintf(
+				"Hey there, just letting you know that\n%s shared the folder %s with you (%s).\n"
+				. "If you are logged in as %s you can go to '%s' and click the tab 'Shared with me' to find the shared folder.\n"
+				. "Also, if you want to sync the share in your desktop sync client add a new folder with this path: %s\n\n"
+				. "Best regards,\nCERNBox Team",
+				$this->userInfo->getDisplayName(), basename($share->getTarget()), $recipientInfo->getUID(), $recipientInfo->getUID(), $serviceURL, $shareInfo['eos.file']);
+
 			$message = $this->mailer->createMessage();
 			$message->setSubject($subject);
 			$message->setTo([$recipientInfo->getEMailAddress() => $recipientInfo->getDisplayName()]);
@@ -82,7 +89,8 @@ class PageController extends Controller {
 			$message->setFrom(['cernbox-noreply@cern.ch']);
 			$message->setReplyTo([$recipientInfo->getEMailAddress()]);
 			$this->mailer->send($message);
-			return new DataResponse(['message' => 'Mail informing about the share sent to ' . $recipientInfo->getEMailAddress()]);
+			$resMessage = sprintf("An email informing about the share has been sent to %s.", $recipientInfo->getEMailAddress());
+			return new DataResponse(['message' => $resMessage]);
 		}
 
 		if ($shareType === \OCP\Share::SHARE_TYPE_GROUP) {
@@ -90,27 +98,31 @@ class PageController extends Controller {
 			if(!$recipientInfo) {
 				throw new ShareNotFound("recipient does not exist");
 			}
-
-			$users = $recipientInfo->getUsers();
-			foreach($users as $user) {
-				$subject = sprintf("%s shared the folder '%s' with you through the e-group '%s'", $this->userInfo->getDisplayName(), basename($shareInfo['eos.file']), $recipient);
-				$htmlBody = sprintf(
-					"<p>Dear user,</p><p><b>%s</b> shared the folder <q><b>%s</b></q> with the e-group <b>%s</b>, which your account <b>%s</b> is member of it.</p>"
-					. "<p>If you are logged in as <b>%s</b> you can click <a href='%s'>here</a> to access the shared folder, else you can go to <a href='%s'>%s</a> and click the tab 'Shared with me' to see the shared folder</p>"
-					. "<p>To synchronise this folder please follow the instructions at <a href=''>this KB</a> using the following path: <p><code>%s</code></p></p>"
-					. "<p>Best regards,</br>CERNBox Team</p>",
-					$this->userInfo->getDisplayName(), basename($shareInfo['eos.file']), $recipient, $user->getUID(), $user->getUID(), $directURL, $sharedWithMeURL, $serviceURL, $shareInfo['eos.file']);
-				$textBody = sprintf("Hola paquito");
-				$message = $this->mailer->createMessage();
-				$message->setSubject($subject);
-				$message->setTo([$user->getEMailAddress() => $user->getDisplayName()]);
-				$message->setHtmlBody($htmlBody);
-				$message->setPlainBody($textBody);
-				$message->setFrom(['cernbox-noreply@cern.ch']);
-				$message->setReplyTo([$this->userInfo->getEMailAddress()]);
-				$this->mailer->send($message);
-				return new DataResponse(['message' => 'Mail informing about the share sent to ' . count($users) . ' members of the e-group ' . $recipient]);
-			}
+			
+			$recipientAddress = $recipient . "@cern.ch";
+			$subject = sprintf("%s shared the folder '%s' with you through the e-group '%s'", $this->userInfo->getDisplayName(), basename($shareInfo['eos.file']), $recipient);
+			$htmlBody = sprintf(
+				"<p>Hey there, just letting you know that </p><p><b>%s</b> shared the folder <q><b>%s</b></q> with the e-group <b>%s</b>, which you are member of it.</p>"
+				. "<p>If you login to <a href='%s'>CERNBox</a> you can click the tab 'Shared with me' to see the shared folder</p>"
+				. "<p>Also, if you want to sync the share in your desktop sync client add a new folder with this path: %s</p>"
+				. "<p>Best regards,</br>CERNBox Team</p>",
+				$this->userInfo->getDisplayName(), basename($share->getTarget()), $recipient, $serviceURL, $shareInfo['eos.file']);
+			$textBody = sprintf(
+				"Hey there, just letting you know that %s shared the folder %s with the e-group %s, which you are member of it\n"
+				. "If you login to <a href='%s'>CERNBox</a> you can click the tab 'Shared with me' to see the shared folder\n"
+				. "Also, if you want to sync the share in your desktop sync client add a new folder with this path: %s\n\n"
+				. "Best regards,\nCERNBox Team",
+				$this->userInfo->getDisplayName(), basename($share->getTarget()), $recipient, $serviceURL, $shareInfo['eos.file']);
+			$message = $this->mailer->createMessage();
+			$message->setSubject($subject);
+			$message->setTo([$recipientAddress => $recipient]);
+			$message->setHtmlBody($htmlBody);
+			$message->setPlainBody($textBody);
+			$message->setFrom(['cernbox-noreply@cern.ch']);
+			$message->setReplyTo([$recipientAddress]);
+			$this->mailer->send($message);
+			$resMessage = sprintf("An email informing about the share has been sent to %s.\nBe aware that email may not arrive to the e-group mailing list if it is restricted.", $recipientAddress);
+			return new DataResponse(['message' => $resMessage]);
 		}
 	}
 
