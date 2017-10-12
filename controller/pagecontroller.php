@@ -58,7 +58,7 @@ class PageController extends Controller {
 
 		$directURL = \OCP\Util::linkToAbsolute('index.php/apps','files', ['dir'=> $share->getTarget()]);
 		$sharedWithMeURL = \OCP\Util::linkToAbsolute('index.php/apps', 'files', ['dir' => '/', 'view' => 'sharingin']);
-		$serviceURL = \OCP\Util::linkToAbsolute();
+		$serviceURL = \OCP\Util::getServerProtocol() . "://" . \OCP\Util::getServerHost();
 
 
 		if($shareType === \OCP\Share::SHARE_TYPE_USER) {
